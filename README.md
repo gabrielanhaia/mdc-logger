@@ -1,7 +1,8 @@
-# MDCLogger
-
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/gabrielanhaia/mdc-logger/php.yml?branch=main)
+![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)
+![GitHub Release](https://img.shields.io/github/v/release/gabrielanhaia/mdc-logger)
 
+# MDCLogger
 
 ## Overview
 
