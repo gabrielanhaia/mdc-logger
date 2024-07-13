@@ -27,12 +27,17 @@ class MDCLogger implements MDCLoggerInterface
         $this->mdcContext[$key] = $value;
     }
 
+    public function getGlobalContext(): array
+    {
+        return $this->mdcContext;
+    }
+
     public function clearGlobalContext(): void
     {
         $this->mdcContext = [];
     }
 
-    public function formatLogContext(array $context): array
+    private function formatLogContext(array $context): array
     {
         return ['mdc_context' => $this->mdcContext, 'local_context' => $context];
     }

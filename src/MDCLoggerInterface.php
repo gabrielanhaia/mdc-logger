@@ -10,7 +10,7 @@ interface MDCLoggerInterface extends LoggerInterface
 {
     public function addGlobalContext(string $key, string $value): void;
 
-    public function clearGlobalContext(): void;
+    public function getGlobalContext(): array;
 
-    public function formatLogContext(array $context): array;
+    public function clearGlobalContext(): void;
 }
