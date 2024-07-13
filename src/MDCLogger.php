@@ -8,13 +8,13 @@ use Psr\Log\LoggerInterface;
 
 class MDCLogger implements MDCLoggerInterface
 {
-    private LoggerInterface $logger;
-
     private array $mdcContext = [];
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(
+        private readonly LoggerInterface $logger,
+        private readonly string          $mdcContextKey = self::DEFAULT_MDC_CONTEXT_KEY
+    )
     {
-        $this->logger = $logger;
     }
 
     public function __destruct()
@@ -39,7 +39,7 @@ class MDCLogger implements MDCLoggerInterface
 
     private function formatLogContext(array $context): array
     {
-        return ['mdc_context' => $this->mdcContext, 'local_context' => $context];
+        return [$this->mdcContextKey => $this->mdcContext, self::DEFAULT_LOCAL_CONTEXT_KEY => $context];
     }
 
     public function emergency(\Stringable|string $message, array $context = []): void

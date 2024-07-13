@@ -3,6 +3,7 @@
 namespace MDCLoggerTests;
 
 use MDCLogger\MDCLogger;
+use MDCLogger\MDCLoggerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -47,119 +48,62 @@ class MDCLoggerTest extends TestCase
         $this->assertEmpty($mdcLogger->getGlobalContext());
     }
 
-    public function testEmergency(): void
+    /**
+     * @dataProvider logContextDataProvider
+     */
+    public function testLogging(string $methodName): void
     {
-        $logMessage = 'emergency test';
+        $logMessage = 'test';
 
         $mdcLogger = $this->getMDCLogger();
-        $mdcLogger->emergency($logMessage, self::LOCAL_CONTEXT);
+        $mdcLogger->$methodName($logMessage, self::LOCAL_CONTEXT);
 
         $mdcLogger->addGlobalContext(self::GLOBAL_CONTEXT_KEY, self::GLOBAL_CONTEXT_VALUE);
 
         $expected = [
-            'mdc_context' => [
+            MDCLoggerInterface::DEFAULT_MDC_CONTEXT_KEY => [
                 self::GLOBAL_CONTEXT_KEY => self::GLOBAL_CONTEXT_VALUE
             ],
-            'local_context' => self::LOCAL_CONTEXT
+            MDCLoggerInterface::DEFAULT_LOCAL_CONTEXT_KEY => self::LOCAL_CONTEXT
         ];
+
+        $this->logger->expects($this->once())
+            ->method($methodName)
+            ->with($logMessage, $expected);
+
+        $mdcLogger->$methodName($logMessage, self::LOCAL_CONTEXT);
+    }
+
+    public function testCustomMDCKey(): void
+    {
+        $customMDCKey = 'custom_key';
+        $logMessage = 'test message';
+        $logLocalContext = ['test_local_key' => 'test_local_value'];
+
+        $mdcLogger = new MDCLogger($this->logger, $customMDCKey);
+        $mdcLogger->addGlobalContext(self::GLOBAL_CONTEXT_KEY, self::GLOBAL_CONTEXT_VALUE);
+
+        $expected = [
+            $customMDCKey => [self::GLOBAL_CONTEXT_KEY => self::GLOBAL_CONTEXT_VALUE],
+            MDCLoggerInterface::DEFAULT_LOCAL_CONTEXT_KEY => $logLocalContext
+        ];
+
+
 
         $this->logger->expects($this->once())
             ->method('emergency')
             ->with($logMessage, $expected);
 
-        $mdcLogger->emergency($logMessage, self::LOCAL_CONTEXT);
+        $mdcLogger->emergency($logMessage, $logLocalContext);
     }
 
-    public function testAlert(): void
+    public static function logContextDataProvider(): \Generator
     {
-        $logMessage = 'alert test';
-
-        $mdcLogger = $this->getMDCLogger();
-        $mdcLogger->alert($logMessage, self::LOCAL_CONTEXT);
-
-        $mdcLogger->addGlobalContext(self::GLOBAL_CONTEXT_KEY, self::GLOBAL_CONTEXT_VALUE);
-
-        $expected = [
-            'mdc_context' => [
-                self::GLOBAL_CONTEXT_KEY => self::GLOBAL_CONTEXT_VALUE
-            ],
-            'local_context' => self::LOCAL_CONTEXT
-        ];
-
-        $this->logger->expects($this->once())
-            ->method('alert')
-            ->with($logMessage, $expected);
-
-        $mdcLogger->alert($logMessage, self::LOCAL_CONTEXT);
-    }
-
-    public function testCritical(): void
-    {
-        $logMessage = 'critical test';
-
-        $mdcLogger = $this->getMDCLogger();
-        $mdcLogger->critical($logMessage, self::LOCAL_CONTEXT);
-
-        $mdcLogger->addGlobalContext(self::GLOBAL_CONTEXT_KEY, self::GLOBAL_CONTEXT_VALUE);
-
-        $expected = [
-            'mdc_context' => [
-                self::GLOBAL_CONTEXT_KEY => self::GLOBAL_CONTEXT_VALUE
-            ],
-            'local_context' => self::LOCAL_CONTEXT
-        ];
-
-        $this->logger->expects($this->once())
-            ->method('critical')
-            ->with($logMessage, $expected);
-
-        $mdcLogger->critical($logMessage, self::LOCAL_CONTEXT);
-    }
-
-    public function testError(): void
-    {
-        $logMessage = 'error test';
-
-        $mdcLogger = $this->getMDCLogger();
-        $mdcLogger->error($logMessage, self::LOCAL_CONTEXT);
-
-        $mdcLogger->addGlobalContext(self::GLOBAL_CONTEXT_KEY, self::GLOBAL_CONTEXT_VALUE);
-
-        $expected = [
-            'mdc_context' => [
-                self::GLOBAL_CONTEXT_KEY => self::GLOBAL_CONTEXT_VALUE
-            ],
-            'local_context' => self::LOCAL_CONTEXT
-        ];
-
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with($logMessage, $expected);
-
-        $mdcLogger->error($logMessage, self::LOCAL_CONTEXT);
-    }
-
-    public function testWarning(): void
-    {
-        $logMessage = 'warning test';
-
-        $mdcLogger = $this->getMDCLogger();
-        $mdcLogger->warning($logMessage, self::LOCAL_CONTEXT);
-
-        $mdcLogger->addGlobalContext(self::GLOBAL_CONTEXT_KEY, self::GLOBAL_CONTEXT_VALUE);
-
-        $expected = [
-            'mdc_context' => [
-                self::GLOBAL_CONTEXT_KEY => self::GLOBAL_CONTEXT_VALUE
-            ],
-            'local_context' => self::LOCAL_CONTEXT
-        ];
-
-        $this->logger->expects($this->once())
-            ->method('warning')
-            ->with($logMessage, $expected);
-
-        $mdcLogger->warning($logMessage, self::LOCAL_CONTEXT);
+        yield 'Emergency' => ['emergency'];
+        yield 'Alert' => ['alert'];
+        yield 'Critical' => ['critical'];
+        yield 'Error' => ['error'];
+        yield 'Warning' => ['warning'];
     }
 
     private function getMDCLogger(): MDCLogger
