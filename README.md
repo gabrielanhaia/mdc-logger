@@ -271,6 +271,7 @@ use Psr\Log\LoggerInterface;
 
 interface MDCLoggerInterface extends LoggerInterface
 {
+    public function __construct(LoggerInterface $logger, string $mdcContextKey = 'mdc_context');
     public function addGlobalContext(string $key, string $value): void;
     public function getGlobalContext(): array;
     public function clearGlobalContext(): void;
