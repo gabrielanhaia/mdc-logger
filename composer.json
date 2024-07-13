@@ -20,5 +20,8 @@
       "MDCLogger\\": "src/",
       "MDCLoggerTests\\": "tests/"
     }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit tests/"
   }
 }
