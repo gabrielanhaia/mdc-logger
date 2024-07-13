@@ -12,6 +12,8 @@ interface MDCLoggerInterface extends LoggerInterface
 
     public const DEFAULT_LOCAL_CONTEXT_KEY = 'local_context';
 
+    public function __construct(LoggerInterface $logger, string $mdcContextKey = self::DEFAULT_MDC_CONTEXT_KEY);
+
     public function addGlobalContext(string $key, string $value): void;
 
     public function getGlobalContext(): array;
