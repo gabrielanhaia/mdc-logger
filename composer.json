@@ -1,0 +1,23 @@
+{
+  "name": "gabrielanhaia/mdc-logger",
+  "description": "Logger based on Mapped Diagnostic Context (MDC) for PHP.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Gabriel Anhaia",
+      "email": "ga.contact.me@gmail.com"
+    }
+  ],
+  "require": {
+    "psr/log": "^3.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "MDCLogger\\": "src/"
+    }
+  }
+}
