@@ -198,6 +198,37 @@ This output shows the following:
 - **datetime**: The timestamp of the log entry.
 - **extra**: Any additional metadata (empty in this case).
 
+### Customizing the MDC Context Key (Optional)
+
+By default, the MDC context key is `mdc_context`. You can customize this key by configuring your DI container to pass the desired key when creating the `MDCLogger` instance.
+In case you care creating the `MDCLogger` instance manually, you can pass the desired key as the second parameter of the constructor.
+
+```php
+$mdcLogger = new MDCLogger($monolog, 'custom_mdc_context');
+```
+
+The output of the logs will now include the custom key:
+
+```json
+{
+  "message": "An error occurred.",
+  "context": {
+    "custom_mdc_context": {
+      "user_id": "12345",
+      "request_id": "abcde",
+      "entity_id": "entity123"
+    },
+    "local_context": {
+      "additional_info": "Some local context data"
+    }
+  },
+  "level": "error",
+  "channel": "app",
+  "datetime": "2024-07-13T12:00:00+00:00",
+  "extra": []
+}
+```
+
 ### Diagram
 
 Below is a diagram showing the flow of adding global context in a controller, logging in different layers, and clearing the context at the end.
@@ -207,15 +238,24 @@ sequenceDiagram
     participant Controller
     participant Service
     participant Repository
-    participant Logger
-
-    Controller->>Logger: addGlobalContext('entity_id', 'entity123')
-    Controller->>Logger: info('Controller action started.')
-    Controller->>Service: call serviceLayerMethod()
-    Service->>Logger: info('Service layer processing.')
-    Service->>Repository: call repositoryLayerMethod()
-    Repository->>Logger: info('Repository layer accessed.')
-    Controller->>Logger: clearGlobalContext()
+    participant MDCLogger
+    participant Logger as LoggerInterface (PSR-3, Monolog, etc.)
+    
+    Controller ->> MDCLogger: addGlobalContext('entity_id', 'entity123')
+    note over MDCLogger: Global context: [entity_id: entity123]
+    Controller ->> MDCLogger: info('Controller action started.')
+    MDCLogger ->> Logger: info('Controller action started.')
+    note over Logger: Log message with global context included.
+    Controller ->> Service: call serviceLayerMethod()
+    Service ->> MDCLogger: info('Service layer processing.')
+    MDCLogger ->> Logger: info('Service layer processing.')
+    note over Logger: Log message with global context included.
+    Service ->> Repository: call repositoryLayerMethod()
+    Repository ->> MDCLogger: info('Repository layer accessed.')
+    MDCLogger ->> Logger: info('Repository layer accessed.')
+    note over Logger: Log message with global context included.
+    Controller ->> MDCLogger: clearGlobalContext()
+    note over MDCLogger: Global context cleared: []
 ```
 
 ## Interface
