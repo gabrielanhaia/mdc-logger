@@ -9,6 +9,8 @@
 
 MDCLogger is a PHP library that provides logging capabilities based on Mapped Diagnostic Context (MDC). It extends the PSR-3 LoggerInterface and allows you to add global context to your log messages.
 
+[Article about MDC Logger in PHP](https://medium.com/devwarlocks/php-mdclogger-enhance-your-php-logging-with-mapped-diagnostic-context-47d91c140136)
+
 ## Installation
 
 To install MDCLogger, use Composer:
